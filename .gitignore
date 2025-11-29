@@ -1,0 +1,8 @@
+# Ignorar executáveis
+*.exe
+*.dll
+autotest     # Para Mac/Linux
+dist/
+
+# Ignorar pastas geradas
+test/
