@@ -1,7 +1,7 @@
 # ⚡ OrchAxon AutoTest CLI
 
 > **AutoTest Gen** is a developer-first tool to generate robust Unit Test boilerplate instantly.
-> Supports **C#, Kotlin, TypeScript, Java, PHP, and Node.js**.
+> Supports **C#, Kotlin, TypeScript, Java, PHP, Node.js and Go(Golang)**.
 
 Developed by **[OrchAxon Labs](https://github.com/Mr-Fullstack)**.
 
