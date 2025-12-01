@@ -24,7 +24,7 @@ Developed by **[OrchAxon Labs](https://github.com/Mr-Fullstack)**.
 ### Option 1: Via Go (Recommended)
 If you have Go installed, this is the fastest way:
 ```bash 
-go install https://github.com/Mr-Fullstack/orchaxon-autotest@latest
+go install github.com/Mr-Fullstack/orchaxon-autotest@latest
 ```
 
 ### Option 2: Manual Download (Binaries)
