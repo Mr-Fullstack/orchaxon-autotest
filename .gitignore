@@ -6,3 +6,9 @@ dist/
 
 # Ignorar pastas geradas
 test/
+spec/
+
+# Ignorar arquivos
+*.ps1
+auth_spec.json
+spec/*.json
