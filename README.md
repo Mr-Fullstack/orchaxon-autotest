@@ -104,7 +104,7 @@ autotest -file auth_spec.json
 ```
 
 
-#### #. Batch Mode (Mass Generation)
+#### 3. Batch Mode (Mass Generation)
 
 Have a folder full of specs? Process them all in a single command using wildcards.
 
