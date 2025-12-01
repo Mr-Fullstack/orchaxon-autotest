@@ -100,7 +100,7 @@ create a spec.json file.1.
 
 **2. Run the tool pointing to the file:**
 ```bash  
-autotest -file auth_spec.json
+orchaxon-autotest -file auth_spec.json
 ```
 
 
@@ -109,7 +109,7 @@ autotest -file auth_spec.json
 Have a folder full of specs? Process them all in a single command using wildcards.
 
 ```bash  
-autotest -file "specs/*.json"
+orchaxon-autotest -file "specs/*.json"
 ```
 
 ### Supported Languages: 
