@@ -9,7 +9,7 @@ Developed by **[OrchAxon Labs](https://github.com/Mr-Fullstack)**.
 
 ## 🚀 Features
 
-- **Zero Config:** Just run `autotest -lang node -class User` and get the code.
+- **Zero Config:** Just run `orchaxon-autotest -lang node -class User` and get the code.
 - **Meta-Framework Support:** Define complex scenarios with Mocks using a simple JSON file.
 - **Multi-Language:** Supports syntax and mocking libraries for 8 languages.
 - **Blazing Fast:** Written in Go, compiles to a single static binary.
@@ -39,19 +39,19 @@ Generate a test file automatically in 3. the test/ folder.
 
 **Syntax:**
 ```bash  
-autotest -lang <language> -class <ClassName>
+orchaxon-autotest -lang <language> -class <ClassName>
 ```
 
 **Examples:**
 ```bash 
 # Generate C# xUnit Test
-autotest -lang csharp -class OrderService
+orchaxon-autotest -lang csharp -class OrderService
 
 # Generate Node.js Native Test
-autotest -lang node -class AuthService
+orchaxon-autotest -lang node -class AuthService
 
 # Generate Kotlin JUnit Test
-autotest -lang kotlin -class PaymentProcessor
+orchaxon-autotest -lang kotlin -class PaymentProcessor
 ```
 
 ### Flag Dictionary (lang):
