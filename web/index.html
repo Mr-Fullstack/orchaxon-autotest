@@ -51,6 +51,13 @@
         input:focus, select:focus, textarea:focus { outline: none; border-color: #3b82f6; }
         .cli-section { background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%); border-top: 1px solid #334155; }
         .terminal-box { background: #000; border: 1px solid #333; border-radius: 8px; padding: 1.5rem; box-shadow: 0 0 20px rgba(139, 92, 246, 0.3); }
+
+        .modal-overlay { background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(4px); transition: opacity 0.3s; }
+        .modal-content { animation: modalAppear 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes modalAppear { 
+            from { opacity: 0; transform: scale(0.95) translateY(-20px); } 
+            to { opacity: 1; transform: scale(1) translateY(0); } 
+        }
     </style>
     
     <script src="https://orchaxonnexus.netlify.app/tracker.js" data-project="autotest-gen" id="orchaxon-tracker" async></script>
@@ -207,6 +214,48 @@
             </div>
         </div>
     </div>
+
+<div id="modal" class="modal-overlay fixed inset-0 z-50 hidden items-center justify-center p-4">
+        <div class="modal-content bg-slate-800 rounded-xl max-w-2xl w-full p-6 border border-slate-700 shadow-2xl">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-white flex items-center gap-2">📋 JSON Structure</h3>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-white text-2xl leading-none">&times;</button>
+            </div>
+
+            <div class="mb-6">
+                <p class="text-slate-300 text-sm mb-4">Use the structure below to define tests directly via JSON:</p>
+                <div class="relative group">
+                    <pre class="text-sm bg-slate-900 p-4 rounded-lg border border-slate-700"><span class="keyword">{</span>
+  <span class="string">"lang"</span>: <span class="string">"csharp"</span>, <span class="comment">// csharp, kotlin, typescript, java, php</span>
+  <span class="string">"class"</span>: <span class="string">"PaymentService"</span>,
+  <span class="string">"method"</span>: <span class="string">"Process"</span>,
+  <span class="string">"cases"</span>: [
+    <span class="string">"Should_Return_True_If_Valid"</span>,
+    <span class="string">"Should_Throw_Exception_If_Offline"</span>
+  ]
+<span class="keyword">}</span></pre>
+                    <button onclick="copyModalExample()" class="absolute top-2 right-2 px-2 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white transition-opacity">
+                        Copy
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-slate-900 border border-slate-700 rounded p-4 mb-6">
+                <h4 class="text-sm font-bold text-slate-300 mb-2">💡 Quick Tips:</h4>
+                <ul class="text-sm text-slate-400 space-y-1 list-disc list-inside font-mono">
+                    <li><strong class="text-blue-400">lang:</strong> "csharp", "kotlin", "typescript", "java", "php"</li>
+                    <li><strong class="text-blue-400">class:</strong> The class under test</li>
+                    <li><strong class="text-blue-400">method:</strong> The specific method being tested</li>
+                    <li><strong class="text-blue-400">cases:</strong> Array of test descriptions</li>
+                </ul>
+            </div>
+
+            <button onclick="closeModal()" class="w-full px-4 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg font-bold text-white transition-colors">
+                Got it, let's code!
+            </button>
+        </div>
+    </div>
+
 
   <script>
         // --- 1. WASM ---
