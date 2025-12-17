@@ -1,0 +1,123 @@
+name: Build and Release
+
+# Dispara apenas quando você envia uma TAG começando com 'v' (ex: v1.0.0)
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  # --- JOB 1: COMPILAR A CLI (Windows, Linux, Mac) ---
+  build-cli:
+    name: Build CLI
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - os: linux
+            arch: amd64
+            output_name: autotest-linux-amd64
+          - os: windows
+            arch: amd64
+            output_name: autotest-windows-amd64.exe # Importante: .exe
+          - os: darwin
+            arch: amd64
+            output_name: autotest-macos-intel
+          - os: darwin
+            arch: arm64
+            output_name: autotest-macos-apple-silicon
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+
+      - name: Build Binary
+        env:
+          GOOS: ${{ matrix.os }}
+          GOARCH: ${{ matrix.arch }}
+        run: |
+          cd cmd/cli
+          # -ldflags="-s -w" diminui o tamanho do binário
+          go build -ldflags="-s -w" -o ../../${{ matrix.output_name }} .
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cli-${{ matrix.os }}-${{ matrix.arch }}
+          path: ${{ matrix.output_name }}
+
+  # --- JOB 2: COMPILAR O WEB (WASM) ---
+  build-wasm:
+    name: Build WASM
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+
+      - name: Build WASM Binary
+        env:
+          GOOS: js
+          GOARCH: wasm
+        run: |
+          cd cmd/wasm
+          go build -ldflags="-s -w" -o ../../web/main.wasm .
+
+      - name: Get Glue Code (wasm_exec.js)
+        run: |
+          # Garante que estamos usando o JS compatível com a versão do Go do runner
+          cp $(go env GOROOT)/misc/wasm/wasm_exec.js web/
+
+      - name: Zip Web Package
+        run: |
+          # Cria um zip contendo o site pronto
+          zip -r autotest-web.zip web/
+
+      - name: Upload Web Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-package
+          path: autotest-web.zip
+
+  # --- JOB 3: CRIAR A RELEASE ---
+  create-release:
+    name: Create Release
+    needs: [build-cli, build-wasm] # Espera os outros terminarem
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download CLI Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: cli-*
+          merge-multiple: true # Junta tudo na mesma pasta
+
+      - name: Download Web Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: web-package
+
+      - name: Publish Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            autotest-linux-amd64
+            autotest-windows-amd64.exe
+            autotest-macos-intel
+            autotest-macos-apple-silicon
+            autotest-web.zip
+          draft: false
+          prerelease: false
+          generate_release_notes: true
