@@ -10,7 +10,7 @@ permissions:
   contents: write
 
 jobs:
-  # --- JOB 1: COMPILAR A CLI (Windows, Linux, Mac) ---
+  # --- JOB 1: COMPILAR Acd.. CLI (Windows, Linux, Mac) ---
   build-cli:
     name: Build CLI
     runs-on: ubuntu-latest
@@ -67,6 +67,11 @@ jobs:
         with:
           go-version: '1.21'
 
+      - name: Get Glue Code (wasm_exec.js)
+        run: |
+         mkdir -p web
+          curl -o web/wasm_exec.js https://raw.githubusercontent.com/golang/go/master/misc/wasm/wasm_exec.js
+
       - name: Build WASM Binary
         env:
           GOOS: js
@@ -74,11 +79,6 @@ jobs:
         run: |
           cd cmd/wasm
           go build -ldflags="-s -w" -o ../../web/main.wasm .
-
-      - name: Get Glue Code (wasm_exec.js)
-        run: |
-          # Garante que estamos usando o JS compatível com a versão do Go do runner
-          cp $(go env GOROOT)/misc/wasm/wasm_exec.js web/
 
       - name: Zip Web Package
         run: |
