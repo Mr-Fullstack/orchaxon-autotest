@@ -1,16 +1,17 @@
 name: Build and Release
 
-# Dispara apenas quando você envia uma TAG começando com 'v' (ex: v1.0.0)
 on:
   push:
     tags:
       - 'v*'
+  # Permite rodar manualmente na aba "Actions" para testar sem criar Tag
+  workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
-  # --- JOB 1: COMPILAR Acd.. CLI (Windows, Linux, Mac) ---
+  # --- JOB 1: COMPILAR A CLI (Windows, Linux, Mac) ---
   build-cli:
     name: Build CLI
     runs-on: ubuntu-latest
@@ -22,7 +23,7 @@ jobs:
             output_name: autotest-linux-amd64
           - os: windows
             arch: amd64
-            output_name: autotest-windows-amd64.exe # Importante: .exe
+            output_name: autotest-windows-amd64.exe
           - os: darwin
             arch: amd64
             output_name: autotest-macos-intel
@@ -37,7 +38,8 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.21'
+          # IMPORTANTE: Usando 1.25.x para compatibilidade com o wasm_exec.js novo
+          go-version: '1.25.x' 
 
       - name: Build Binary
         env:
@@ -45,7 +47,6 @@ jobs:
           GOARCH: ${{ matrix.arch }}
         run: |
           cd cmd/cli
-          # -ldflags="-s -w" diminui o tamanho do binário
           go build -ldflags="-s -w" -o ../../${{ matrix.output_name }} .
 
       - name: Upload Artifact
@@ -65,11 +66,13 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.21'
+          # Mesma versão do Job acima
+          go-version: '1.25.x'
 
       - name: Get Glue Code (wasm_exec.js)
         run: |
-         mkdir -p web
+          mkdir -p web
+          # Baixa o JS mais atual para bater com o Go 1.25+
           curl -o web/wasm_exec.js https://raw.githubusercontent.com/golang/go/master/misc/wasm/wasm_exec.js
 
       - name: Build WASM Binary
@@ -82,7 +85,6 @@ jobs:
 
       - name: Zip Web Package
         run: |
-          # Cria um zip contendo o site pronto
           zip -r autotest-web.zip web/
 
       - name: Upload Web Artifact
@@ -94,14 +96,16 @@ jobs:
   # --- JOB 3: CRIAR A RELEASE ---
   create-release:
     name: Create Release
-    needs: [build-cli, build-wasm] # Espera os outros terminarem
+    needs: [build-cli, build-wasm]
     runs-on: ubuntu-latest
+    # Só roda se for uma TAG (não roda no teste manual workflow_dispatch)
+    if: startsWith(github.ref, 'refs/tags/')
     steps:
       - name: Download CLI Artifacts
         uses: actions/download-artifact@v4
         with:
           pattern: cli-*
-          merge-multiple: true # Junta tudo na mesma pasta
+          merge-multiple: true
 
       - name: Download Web Artifact
         uses: actions/download-artifact@v4
@@ -110,7 +114,6 @@ jobs:
 
       - name: Publish Release
         uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
             autotest-linux-amd64
